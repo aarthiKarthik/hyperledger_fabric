@@ -1,0 +1,49 @@
+Enrolling as user Jim:
+curl -s -X POST http://localhost:4000/users -H "content-type: application/x-www-form-urlencoded" -d 'username=Jim&orgName=Org1'
+
+export ORG1_TOKEN=<result of previous cmd token>
+
+Create channel
+curl -s -X POST \
+  http://localhost:4000/channels \
+  -H "authorization: Bearer $ORG1_TOKEN" \
+  -H "content-type: application/json" \
+  -d '{
+	"channelName":"mychannel",
+	"channelConfigPath":"../artifacts/channel/mychannel.tx"
+}'
+
+Join peers to channel
+curl -s -X POST \
+  http://localhost:4000/channels/mychannel/peers \
+  -H "authorization: Bearer $ORG1_TOKEN" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com","peer1.org1.example.com"]
+}'
+
+Install CC
+curl -s -X POST \
+  http://localhost:4000/chaincodes \
+  -H "authorization: Bearer $ORG1_TOKEN" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
+	"chaincodeName":"mycc",
+	"chaincodePath":"github.com/sidedb_cc/go",
+	"chaincodeType": "golang",
+	"chaincodeVersion":"v0"
+}'
+
+Instantiate CC - with collections_config.json added
+curl -s -X POST \
+  http://localhost:4000/channels/mychannel/chaincodes \
+  -H "authorization: Bearer $ORG1_TOKEN" \
+  -H "content-type: application/json" \
+  -d '{
+	"chaincodeName":"mycc",
+	"chaincodeVersion":"v0",
+	"chaincodeType": "golang",
+	"args": [""],
+	"collectionsConfigPath": "artifacts/src/github.com/sidedb_cc/collections_config.json"
+}'
