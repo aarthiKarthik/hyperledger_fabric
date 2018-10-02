@@ -1,0 +1,25 @@
+How to Upgrade chaincode on Hyperledger Fabric:
+
+This writeup shows how to deploy and then upgrade chaincode written in Go for the BYFN sample network and the marbles private data collection chaincode on Fabric v 1.2.0.
+
+Deploying the 'fisrt-network' and playing with chaincode:
+The steps mentioned below are explained in detail in this tutorial: https://hyperledger-fabric.readthedocs.io/en/latest/private_data_tutorial.html
+
+1) Tear down existing containers using: byfn.sh -m down
+2) Bring up the new network with: byfn.sh up -c mychannel -s couchdb -i 1.2.0
+3) Open a  bash shell into the cli container by: docker exec -it cli bash
+4) Install v1.0 chaincode on all peers
+5) Instantiate the chaincode v1.0
+6) Initmarble, query etc for "marbel1"
+
+Upgrading Chaincode:
+1) Update the same chaincode file (see attached file modified with an addl. Timestamp field added to the marbles data type) within the global chaincode folder.
+2) Build the chaincode using Go (go build xxx.go) and verify if there are no compile issues.
+3) Copy the chaincode into the cli container by:
+   docker cp marbles_private_chaincode.go cli:/opt/gopath/src/github.com/chaincode/marbles02_private/go/marbles02_private_chaincode.go
+   (make sure chaincode name is the same)
+3) Install on all peers using exactly the same chaincode name and v2.0 (same as step 4 above, with ver number changed)
+4) Upgrade chaincode using: peer chaincode upgrade -o orderer.... -v 2.0 (same as instantiate in step 5, with both the keyword and version numbers changed)
+5) Invoke chaincode function to initMarble with a new marble2 and additional timestamp value
+6) Query the chaincode for the newly added parameter
+
